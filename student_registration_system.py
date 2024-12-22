@@ -96,7 +96,7 @@ def save_record():
 
 #Registration No.
 def registration_no():
-    file=openpyxl.load_workbook('Student_data.xlsx')
+    file = openpyxl.load_workbook(r"C:\Users\realm\OneDrive\Desktop\Student_data.xlsx")
     sheet=file.active
     row=sheet.max_row
 
@@ -136,40 +136,36 @@ def Clear():
     img=""
 
 def search():
-    text = Search.get()
+    text = Search.get().strip()  # Ensure input is clean
+    
+    if not text.isdigit():
+        messagebox.showerror("Invalid Input", "Registration number must be numeric.")
+        return
 
     Clear()
     saveButton.config(state='disable')
 
-    file=openpyxl.load_workbook("Student_data.xlsx")
-    sheet=file.active
-
-    for row in sheet.rows:
-        if row[0].value == int(text):
-            name=row[0]
-            reg_no_position=(str(name))[14:-1]
-            reg_number=str(name)[15:-1]
-
     try:
-        print(str(name))
-    except:
-        messagebox.showerror("Invalid","Invalid registration number!!!")
+        file = openpyxl.load_workbook("Student_data.xlsx")
+        sheet = file.active
+    except FileNotFoundError:
+        messagebox.showerror("Error", "Student_data.xlsx not found.")
+        return
 
-    x1=sheet.cell(row=int(reg_number),column=1).value
-    x2=sheet.cell(row=int(reg_number),column=2).value
-    x3=sheet.cell(row=int(reg_number),column=3).value
-    x4=sheet.cell(row=int(reg_number),column=4).value
-    x5=sheet.cell(row=int(reg_number),column=5).value
-    x6=sheet.cell(row=int(reg_number),column=6).value
-    x7=sheet.cell(row=int(reg_number),column=7).value
-    x8=sheet.cell(row=int(reg_number),column=8).value
-    x9=sheet.cell(row=int(reg_number),column=9).value
-    x10=sheet.cell(row=int(reg_number),column=10).value
-    x11=sheet.cell(row=int(reg_number),column=11).value
-    x12=sheet.cell(row=int(reg_number),column=12).value
-            
-    
+    reg_number = int(text)
 
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        if row[0] == reg_number:
+            # Assuming Registration, Name, Class, etc., are Tkinter StringVars
+            Registration.set(row[0])
+            Name.set(row[1])
+            Class.set(row[2])
+            # Set other fields as needed
+            return
+
+    messagebox.showinfo("Search", "No record found.")
+
+        
 #Save
 def Save():
     R1 = Registration.get()
@@ -329,8 +325,8 @@ FO_entry.place(x=160, y=100)
 Label(obj2, text="Mother's Name:", font="arial 13", bg=framebg, fg=framefg).place(x=500, y=50)
 Label(obj2, text="Occupation:", font="arial 13", bg=framebg, fg=framefg).place(x=500, y=100)
 
-Mother_Name = StringVar()
-M_entry = Entry(obj2, textvariable=Mother_Name, width=20, font="arial 10")
+M_Name = StringVar()
+M_entry = Entry(obj2, textvariable=M_Name, width=20, font="arial 10")
 M_entry.place(x=630, y=50)
 
 Mother_Occupation = StringVar()
@@ -348,10 +344,9 @@ lbl.place(x=0, y=0)
 
 # Buttons
 Button(root, text="Upload", width=19, height=2, font="arial 12 bold", bg="lightblue",command=showimage).place(x=1000, y=370)
-Button(root, text="Save", width=19, height=2, font="arial 12 bold", bg="lightgreen",command=Save).place(x=1000, y=450)
+saveButton = Button(root, text="Save", width=19, height=2, font="arial 12 bold", bg="lightgreen",command=Save).place(x=1000, y=450)
 Button(root, text="Reset", width=19, height=2, font="arial 12 bold", bg="lightpink",command=Clear).place(x=1000, y=530)
 Button(root, text="Exit", width=19, height=2, font="arial 12 bold", bg="grey").place(x=1000, y=610)
 
 root.mainloop()
-
 
